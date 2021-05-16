@@ -1,0 +1,49 @@
+.grid {
+  width: 300px;
+  height: 300px;
+  border: 1px solid #000;
+  display: flex;
+  flex-wrap: wrap;
+
+  div {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.invader {
+  background-color: purple;
+  border-radius: 10px;
+}
+
+.shooter {
+  background-color: red;
+}
+
+// $primary: #c2e884;
+// $accent: #84ddff;
+
+// // mixins allows us to combine styles into one style rule
+// @mixin border-radius($radius) {
+//   -webkit-border-radius: $radius;
+//   -ms-border-radius: $radius;
+//   border-radius: $radius;
+// }
+
+// body {
+//   background: $primary;
+//   color: $accent;
+
+//   div {
+//     background: $primary;
+//   }
+
+//   article {
+//     background: $primary;
+//     border: 1px solid $accent;
+//     // to use mixin we must use prefix @include and then name of mixin
+//     @include border-radius(10px);
+//   }
+// }
+
+// @import "footer";
