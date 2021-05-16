@@ -1,6 +1,12 @@
 const grid = document.querySelector(".grid");
+const resultsDisplay = document.querySelector(".results");
 let currentShooterIndex = 202;
 let width = 15;
+let direction = 1;
+let invadersId;
+let goingRight = true;
+let aliensRemoved = [];
+let score = 0;
 
 for (let i = 0; i < 225; i++) {
   const square = document.createElement("div");
@@ -17,7 +23,13 @@ const alienInvaders = [
 
 const draw = function () {
   for (let i = 0; i < alienInvaders.length; i++) {
-    squares[alienInvaders[i]].classList.add("invader");
+    if (!aliensRemoved.includes(i)) {
+      squares[alienInvaders[i]].classList.add("invader");
+    }
+  }
+  if (aliensRemoved.length === alienInvaders.length) {
+    resultsDisplay.innerHTML = "You Win";
+    clearInterval(invadersId);
   }
 };
 
@@ -25,7 +37,7 @@ draw();
 
 const remove = function () {
   for (let i = 0; i < alienInvaders.length; i++) {
-    squares[alienInvaders[i]].classList.add("invader");
+    squares[alienInvaders[i]].classList.remove("invader");
   }
 };
 
@@ -55,11 +67,76 @@ const moveInvaders = function () {
 
   remove();
 
+  if (rightEdge && goingRight) {
+    for (let i = 0; i < alienInvaders.length; i++) {
+      alienInvaders[i] += width + 1;
+      direction = -1;
+      goingRight = false;
+    }
+  }
+
+  if (leftEdge && !goingRight) {
+    for (let i = 0; i < alienInvaders.length; i++) {
+      alienInvaders[i] += width - 1;
+      direction = 1;
+      goingRight = true;
+    }
+  }
+
   for (let i = 0; i < alienInvaders.length; i++) {
-    alienInvaders[i] += 1;
+    alienInvaders[i] += direction;
   }
 
   draw();
+
+  if (squares[currentShooterIndex].classList.contains("invader", "shooter")) {
+    resultsDisplay.innerHTML = "Game Over";
+    clearInterval(invadersId);
+  }
+
+  for (let i = 0; i < alienInvaders.length; i++) {
+    if (alienInvaders[i] > squares.length) {
+      resultsDisplay.innerHTML = "Game Over";
+      clearInterval(invadersId);
+    }
+  }
 };
 
-// setInterval(moveInvaders, 500);
+// setInterval(function, x) runs designated function every 'x' amount of seconds
+invadersId = setInterval(moveInvaders, 800);
+
+const shoot = function (event) {
+  let laserId;
+  let currentLaserIndex = currentShooterIndex;
+
+  const moveLaser = function () {
+    squares[currentLaserIndex].classList.remove("laser");
+    currentLaserIndex -= width;
+    squares[currentLaserIndex].classList.add("laser");
+
+    if (squares[currentLaserIndex].classList.contains("invader")) {
+      squares[currentLaserIndex].classList.remove("laser");
+      squares[currentLaserIndex].classList.remove("invader");
+      squares[currentLaserIndex].classList.add("boom");
+
+      setTimeout(
+        () => squares[currentLaserIndex].classList.remove("boom"),
+        300
+      );
+      clearInterval(laserId);
+
+      const alienRemoved = alienInvaders.indexOf(currentLaserIndex);
+      aliensRemoved.push(alienRemoved);
+      score++;
+      resultsDisplay.innerHTML = score;
+      console.log(aliensRemoved);
+    }
+  };
+
+  switch (event.key) {
+    case "ArrowUp":
+      laserId = setInterval(moveLaser, 100);
+  }
+};
+
+document.addEventListener("keydown", shoot);
